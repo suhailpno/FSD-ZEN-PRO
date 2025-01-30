@@ -18,13 +18,27 @@ const MovieGrid = ({ searchQuery }: MovieGridProps) => {
     queryKey: ["movies", searchQuery],
     queryFn: async () => {
       if (!searchQuery) return [];
+      
+      // Handle default movies (comma-separated IMDb IDs)
+      if (searchQuery.includes(",")) {
+        const movieIds = searchQuery.split(",");
+        const moviePromises = movieIds.map(async (id) => {
+          const response = await fetch(
+            `https://www.omdbapi.com/?apikey=c9780bdd&i=${id}`
+          );
+          return response.json();
+        });
+        return Promise.all(moviePromises);
+      }
+      
+      // Handle search query
       const response = await fetch(
         `https://www.omdbapi.com/?apikey=c9780bdd&s=${searchQuery}&type=movie`
       );
       const data = await response.json();
       return data.Search || [];
     },
-    enabled: searchQuery.length > 2,
+    enabled: searchQuery.length > 0,
   });
 
   if (isLoading) {
