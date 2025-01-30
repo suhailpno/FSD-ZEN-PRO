@@ -41,13 +41,13 @@ const MovieDetails = () => {
 
   const handlePayment = async (seats: string[]) => {
     try {
-      // Simulate payment processing
       const amount = seats.length * 10; // $10 per seat
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       
       const { error } = await supabase.from("bookings").insert({
         user_id: user?.id,
-        movie_id: id,
-        showtime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+        movie_id: id as string,
+        showtime: tomorrow.toISOString(), // Convert Date to ISO string format
         seats,
         amount,
         payment_status: "completed",
